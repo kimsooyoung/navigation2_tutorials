@@ -122,6 +122,9 @@ bool PurePursuitController::isGoalReached(
     return true;
   }
 
+  // Check it out
+  // https://github.com/ros-planning/navigation2/blob/08f869f722f78b74bab9fa3f1905c78d3d3aa430/nav2_dwb_controller/dwb_core/src/dwb_local_planner.cpp#L238
+
   return false;
 }
 
