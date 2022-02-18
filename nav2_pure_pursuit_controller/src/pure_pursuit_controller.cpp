@@ -9,6 +9,8 @@
 #include <string>
 #include <memory>
 
+#include "angles/angles.h"
+
 #include "nav2_core/exceptions.hpp"
 #include "nav2_util/node_utils.hpp"
 #include "nav2_pure_pursuit_controller/pure_pursuit_controller.hpp"
@@ -117,32 +119,57 @@ bool PurePursuitController::isGoalReached(
 {
   if (global_plan_.poses.size() == 0) {
     RCLCPP_WARN(rclcpp::get_logger(
-        "DWBLocalPlanner"), "Cannot check if the goal is reached without the goal being set!");
+        "PurePursuitController"), "Cannot check if the goal is reached without the goal being set!");
     return false;
   }
-  nav_2d_msgs::msg::Pose2DStamped local_start_pose2d, goal_pose2d, local_goal_pose2d;
 
-  nav_2d_utils::transformPose(tf_, costmap_ros_->getGlobalFrameID(),
-    nav_2d_utils::poseStampedToPose2D(pose),
-    local_start_pose2d, transform_tolerance_);
+  geometry_msgs::msg::Pose current_pose = pose.pose;
+  geometry_msgs::msg::Pose goal_pose = global_plan_.poses.back().pose;
 
-  goal_pose2d.header.frame_id = global_plan_.header.frame_id;
-  goal_pose2d.pose = global_plan_.poses.back();
+  return isGoalReachedfromGoalChecker(current_pose, goal_pose, velocity);
 
-  nav_2d_utils::transformPose(tf_, costmap_ros_->getGlobalFrameID(), goal_pose2d,
-    local_goal_pose2d, transform_tolerance_);
+  // nav_2d_msgs::msg::Pose2DStamped local_start_pose2d, goal_pose2d, local_goal_pose2d;
 
-  geometry_msgs::msg::PoseStamped local_start_pose, local_goal_pose;
-  local_start_pose = nav_2d_utils::pose2DToPoseStamped(local_start_pose2d);
-  local_goal_pose = nav_2d_utils::pose2DToPoseStamped(local_goal_pose2d);
+  // nav_2d_utils::transformPose(tf_, costmap_ros_->getGlobalFrameID(),
+  //   nav_2d_utils::poseStampedToPose2D(pose),
+  //   local_start_pose2d, transform_tolerance_);
 
-  return goal_checker_->isGoalReached(local_start_pose.pose,
-           local_goal_pose.pose, velocity);
+  // goal_pose2d.header.frame_id = global_plan_.header.frame_id;
+  // goal_pose2d.pose = global_plan_.poses.back();
+
+  // nav_2d_utils::transformPose(tf_, costmap_ros_->getGlobalFrameID(), goal_pose2d,
+  //   local_goal_pose2d, transform_tolerance_);
+
+  // geometry_msgs::msg::PoseStamped local_start_pose, local_goal_pose;
+  // local_start_pose = nav_2d_utils::pose2DToPoseStamped(local_start_pose2d);
+  // local_goal_pose = nav_2d_utils::pose2DToPoseStamped(local_goal_pose2d);
+
+  // return isGoalReachedfromGoalChecker(local_start_pose.pose,
+  //          local_goal_pose.pose, velocity);
+
   // Check it out
   // https://github.com/ros-planning/navigation2/blob/08f869f722f78b74bab9fa3f1905c78d3d3aa430/nav2_dwb_controller/dwb_core/src/dwb_local_planner.cpp#L238
 
   return false;
 }
+
+bool PurePursuitController::isGoalReachedfromGoalChecker(
+  const geometry_msgs::msg::Pose & query_pose, const geometry_msgs::msg::Pose & goal_pose,
+  const geometry_msgs::msg::Twist &)
+{
+  double xy_goal_tolerance_sq_ = 0.0625;
+  double yaw_goal_tolerance_ = 0.25;
+
+  double dx = query_pose.position.x - goal_pose.position.x,
+    dy = query_pose.position.y - goal_pose.position.y;
+  if (dx * dx + dy * dy > xy_goal_tolerance_sq_) {
+    return false;
+  }
+  double dyaw = angles::shortest_angular_distance(tf2::getYaw(query_pose.orientation),
+      tf2::getYaw(goal_pose.orientation));
+  return fabs(dyaw) < yaw_goal_tolerance_;
+}
+
 
 geometry_msgs::msg::TwistStamped PurePursuitController::computeVelocityCommands(
   const geometry_msgs::msg::PoseStamped & pose,

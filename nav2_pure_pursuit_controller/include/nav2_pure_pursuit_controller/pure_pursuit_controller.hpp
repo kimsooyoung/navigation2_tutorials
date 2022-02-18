@@ -39,6 +39,10 @@ public:
     const geometry_msgs::msg::PoseStamped & pose,
     const geometry_msgs::msg::Twist & velocity) override;
 
+  bool isGoalReachedfromGoalChecker(
+    const geometry_msgs::msg::Pose & query_pose, const geometry_msgs::msg::Pose & goal_pose,
+    const geometry_msgs::msg::Twist & velocity);
+
   geometry_msgs::msg::TwistStamped computeVelocityCommands(
     const geometry_msgs::msg::PoseStamped & pose,
     const geometry_msgs::msg::Twist & velocity) override;

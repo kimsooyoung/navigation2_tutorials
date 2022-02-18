@@ -12,6 +12,10 @@ find_package(nav_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(tf2 REQUIRED)
 
+# Customized
+find_package(angles REQUIRED)
+
+# DWB Copy
 find_package(std_msgs REQUIRED)
 find_package(nav_2d_msgs REQUIRED)
 find_package(dwb_msgs REQUIRED)
@@ -26,6 +30,8 @@ include_directories(
   include
 )
 
+set(library_name ${PROJECT_NAME}_plugin)
+
 set(dependencies
   rclcpp
   geometry_msgs
@@ -35,40 +41,44 @@ set(dependencies
   nav2_util
   nav2_core
   tf2
+  angles
 )
 
-add_library(nav2_pure_pursuit_controller SHARED
+add_library(${library_name} SHARED
         src/pure_pursuit_controller.cpp)
 
-# prevent pluginlib from using boost
-target_compile_definitions(nav2_pure_pursuit_controller PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
-
-ament_target_dependencies(nav2_pure_pursuit_controller
+ament_target_dependencies(${library_name}
   ${dependencies}
 )
 
-install(TARGETS nav2_pure_pursuit_controller
+# prevent pluginlib from using boost
+target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+
+pluginlib_export_plugin_description_file(nav2_core nav2_pure_pursuit_controller.xml)
+
+install(TARGETS ${library_name}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+  # RUNTIME DESTINATION bin
 )
 
 install(DIRECTORY include/
   DESTINATION include/
 )
 
+install(FILES nav2_pure_pursuit_controller.xml
+  DESTINATION share/${PROJECT_NAME}
+)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
-  set(ament_cmake_copyright_FOUND TRUE)
+  # set(ament_cmake_copyright_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_export_include_directories(include)
-ament_export_libraries(nav2_pure_pursuit_controller)
+ament_export_libraries(${library_name})
 ament_export_dependencies(${dependencies})
-
-pluginlib_export_plugin_description_file(nav2_core nav2_pure_pursuit_controller.xml)
-
 ament_package()
-
