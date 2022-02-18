@@ -56,7 +56,7 @@ protected:
     const rclcpp::Duration & transform_tolerance
   ) const;
 
-  rclcpp_lifecycle::LifecycleNode::WeakPtr node_;
+  rclcpp_lifecycle::LifecycleNode::SharedPtr node_;
   std::shared_ptr<tf2_ros::Buffer> tf_;
   std::string plugin_name_;
   std::shared_ptr<nav2_costmap_2d::Costmap2DROS> costmap_ros_;

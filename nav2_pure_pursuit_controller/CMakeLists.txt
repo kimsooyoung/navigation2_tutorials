@@ -12,6 +12,14 @@ find_package(nav_msgs REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(tf2 REQUIRED)
 
+find_package(std_msgs REQUIRED)
+find_package(nav_2d_msgs REQUIRED)
+find_package(dwb_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
+find_package(nav_2d_utils REQUIRED)
+find_package(tf2_ros REQUIRED)
+
 nav2_package()
 
 include_directories(
