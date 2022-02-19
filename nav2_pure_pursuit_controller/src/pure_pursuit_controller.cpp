@@ -227,8 +227,7 @@ nav_msgs::msg::Path
 PurePursuitController::transformGlobalPlan(
   const geometry_msgs::msg::PoseStamped & pose)
 {
-  // Original mplementation taken fron nav2_dwb_controller
-
+  // Original implementation taken fron nav2_dwb_controller
   if (global_plan_.poses.empty()) {
     throw nav2_core::PlannerException("Received plan with zero length");
   }
