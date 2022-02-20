@@ -127,29 +127,9 @@ bool PurePursuitController::isGoalReached(
   geometry_msgs::msg::Pose current_pose = pose.pose;
   geometry_msgs::msg::Pose goal_pose = global_plan_.poses.back().pose;
 
-  return isGoalReachedfromGoalChecker(current_pose, goal_pose, velocity);
-
-  // nav_2d_msgs::msg::Pose2DStamped local_start_pose2d, goal_pose2d, local_goal_pose2d;
-
-  // nav_2d_utils::transformPose(tf_, costmap_ros_->getGlobalFrameID(),
-  //   nav_2d_utils::poseStampedToPose2D(pose),
-  //   local_start_pose2d, transform_tolerance_);
-
-  // goal_pose2d.header.frame_id = global_plan_.header.frame_id;
-  // goal_pose2d.pose = global_plan_.poses.back();
-
-  // nav_2d_utils::transformPose(tf_, costmap_ros_->getGlobalFrameID(), goal_pose2d,
-  //   local_goal_pose2d, transform_tolerance_);
-
-  // geometry_msgs::msg::PoseStamped local_start_pose, local_goal_pose;
-  // local_start_pose = nav_2d_utils::pose2DToPoseStamped(local_start_pose2d);
-  // local_goal_pose = nav_2d_utils::pose2DToPoseStamped(local_goal_pose2d);
-
-  // return isGoalReachedfromGoalChecker(local_start_pose.pose,
-  //          local_goal_pose.pose, velocity);
-
   // Check it out
   // https://github.com/ros-planning/navigation2/blob/08f869f722f78b74bab9fa3f1905c78d3d3aa430/nav2_dwb_controller/dwb_core/src/dwb_local_planner.cpp#L238
+  return isGoalReachedfromGoalChecker(current_pose, goal_pose, velocity);
 
   return false;
 }
