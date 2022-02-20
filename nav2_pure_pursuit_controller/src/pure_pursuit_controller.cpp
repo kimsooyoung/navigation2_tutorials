@@ -52,38 +52,39 @@ void PurePursuitController::configure(
   std::string name, const std::shared_ptr<tf2_ros::Buffer> & tf,
   const std::shared_ptr<nav2_costmap_2d::Costmap2DROS> & costmap_ros)
 {
-  // node_ = parent;
-  auto node = parent;
-
+  node_ = parent;
+ 
+  // For "weak_ptr" api
+  // auto node = parent;
   // auto node = node_.lock();
 
   costmap_ros_ = costmap_ros;
   tf_ = tf;
   plugin_name_ = name;
-  logger_ = node->get_logger();
-  clock_ = node->get_clock();
+  logger_ = node_->get_logger();
+  clock_ = node_->get_clock();
 
   declare_parameter_if_not_declared(
-    node, plugin_name_ + ".desired_linear_vel", rclcpp::ParameterValue(
+    node_, plugin_name_ + ".desired_linear_vel", rclcpp::ParameterValue(
       0.2));
   declare_parameter_if_not_declared(
-    node, plugin_name_ + ".lookahead_dist",
+    node_, plugin_name_ + ".lookahead_dist",
     rclcpp::ParameterValue(0.4));
   declare_parameter_if_not_declared(
-    node, plugin_name_ + ".max_angular_vel", rclcpp::ParameterValue(
+    node_, plugin_name_ + ".max_angular_vel", rclcpp::ParameterValue(
       1.0));
   declare_parameter_if_not_declared(
-    node, plugin_name_ + ".transform_tolerance", rclcpp::ParameterValue(
+    node_, plugin_name_ + ".transform_tolerance", rclcpp::ParameterValue(
       0.1));
 
-  node->get_parameter(plugin_name_ + ".desired_linear_vel", desired_linear_vel_);
-  node->get_parameter(plugin_name_ + ".lookahead_dist", lookahead_dist_);
-  node->get_parameter(plugin_name_ + ".max_angular_vel", max_angular_vel_);
+  node_->get_parameter(plugin_name_ + ".desired_linear_vel", desired_linear_vel_);
+  node_->get_parameter(plugin_name_ + ".lookahead_dist", lookahead_dist_);
+  node_->get_parameter(plugin_name_ + ".max_angular_vel", max_angular_vel_);
   double transform_tolerance;
-  node->get_parameter(plugin_name_ + ".transform_tolerance", transform_tolerance);
+  node_->get_parameter(plugin_name_ + ".transform_tolerance", transform_tolerance);
   transform_tolerance_ = rclcpp::Duration::from_seconds(transform_tolerance);
 
-  global_pub_ = node->create_publisher<nav_msgs::msg::Path>("received_global_plan", 1);
+  global_pub_ = node_->create_publisher<nav_msgs::msg::Path>("received_global_plan", 1);
 }
 
 void PurePursuitController::cleanup()
